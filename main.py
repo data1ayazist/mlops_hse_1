@@ -39,7 +39,7 @@ async def train_model_endpoint(
     """
     # Читаем содержимое файла params
     if not model_type in [model_type.value for model_type in ModelType]:
-        return JSONResponse(content={"Такой тип модели не поддерживается, см. /model-types/"}, status_code=400)
+        return JSONResponse(content={"error":"Такой тип модели не поддерживается, см. /model-types/"}, status_code=400)
     params_content = await params.read()
     params_dict = json.loads(params_content)  # Преобразуем содержимое в словарь
     # Чтение данных из загруженного CSV файла
