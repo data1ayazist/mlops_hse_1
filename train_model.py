@@ -3,7 +3,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 
 
-def train_model(model_type, data: pd.DataFrame, params: dict):
+def train_model(model_type, data: pd.DataFrame, params: dict = None):
     # Предполагаем, что последний столбец - это целевая переменная
     X = data.iloc[:, :-1]  # Все столбцы, кроме последнего
     y = data.iloc[:, -1]   # Последний столбец

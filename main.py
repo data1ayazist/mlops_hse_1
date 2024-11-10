@@ -1,33 +1,45 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.responses import JSONResponse
 import pandas as pd
-from typing import Dict, Any
+from data_models import ModelType
 from train_model import train_model, retrain_model
 import joblib
 import os
 import yaml
-from enum import Enum
 import json
 from io import StringIO
-from pydantic import BaseModel
+from typing import  Annotated
 
 app = FastAPI()
-
-class ModelType(str, Enum):
-    SVC = "SVC"
-    RandomForest = "RandomForest"
-
-app = FastAPI()
-
 
 @app.post("/train/")
 async def train_model_endpoint(
-    model_type: str,
-    model_name: str,
+    model_type: Annotated[str, Query(description='Тип модели, которую нужно создать')] = 'SVC',
+    model_name: Annotated[str, Query(description='Имя модели, которую нужно создать')] = 'my_model', 
     params: UploadFile = File(...),
     file: UploadFile = File(...)
-):
+)-> JSONResponse:
+    """
+    Обучает модель на основе предоставленных данных и параметров.
+
+    - **model_type**: Тип модели, которую нужно создать (например, "SVC").
+    - **model_name**: Имя модели, под которым она будет сохранена.
+    - **params**: Файл с параметрами для обучения модели в формате JSON.
+    - **file**: Файл с данными для обучения модели в формате CSV.
+
+    Обучает модель и сохраняет её в соотвествующей директории, возвращает JSON-ответ с сообщением об успешном обучении модели или ошибкой.
+
+    - **Успешный ответ**: 
+        - Код: 200
+        - Содержимое: {"message": "Модель успешно обучена и сохранена."}
+    
+    - **Ошибка**: 
+        - Код: 400
+        - Содержимое: {"error": "Описание ошибки"}
+    """
     # Читаем содержимое файла params
+    if not model_type in [model_type.value for model_type in ModelType]:
+        return JSONResponse(content={"Такой тип модели не поддерживается, см. /model-types/"}, status_code=400)
     params_content = await params.read()
     params_dict = json.loads(params_content)  # Преобразуем содержимое в словарь
     # Чтение данных из загруженного CSV файла
@@ -46,18 +58,40 @@ async def train_model_endpoint(
         return JSONResponse(content={"error": str(e)}, status_code=400)
     
 @app.get("/model-types/")
-async def get_model_types():
+async def get_model_types()-> dict:
+    """
+    Получает список типов моделей.
+
+    Returns:
+        dict: Словарь с доступными типами моделей.
+    """
     return {"model_types": [{model_type: model_type.value} for model_type in ModelType]}
 
 @app.get("/healthcheck")
-async def healthcheck():
+async def healthcheck()-> dict:
+    """
+    Проверяет состояние сервиса.
+
+    Returns:
+        dict: Словарь с информацией о состоянии сервиса.
+    """
     return {"status": "healthy"}
 
 @app.post("/retrain/")
 async def retrain_model_endpoint(
-    model_name: str,
+    model_name: Annotated[str, Query(description='Имя модели, которую нужно переобучить')],
     file: UploadFile = File(...)
-):
+)-> JSONResponse:
+    """
+    Переобучает модель на основе загруженных данных.
+
+    Args:
+        model_name (str): Имя модели, которую нужно переобучить.
+        file (UploadFile): CSV файл с новыми данными для переобучения.
+
+    Returns:
+        JSONResponse: Ответ с сообщением о результате операции.
+    """
     try:
         # Чтение данных из загруженного CSV файла
         contents = await file.read()
@@ -90,9 +124,19 @@ async def retrain_model_endpoint(
     
 @app.post("/predict/")
 async def predict_model_endpoint(
-    model_name: str,
+    model_name: Annotated[str, Query(description='Имя модели, через которую нужно дать прогноз')],
     file: UploadFile = File(...)
-):
+)-> JSONResponse:
+    """
+    Выполняет предсказание с использованием указанной модели.
+
+    Args:
+        model_name (str): Имя модели, через которую нужно дать прогноз.
+        file (UploadFile): CSV файл с данными для предсказания.
+
+    Returns:
+        JSONResponse: Ответ с предсказаниями или сообщением об ошибке.
+    """
     try:
         # Чтение данных из загруженного CSV файла
         contents = await file.read()
@@ -121,7 +165,16 @@ async def predict_model_endpoint(
         return JSONResponse(content={"error": str(e)}, status_code=400)
     
 @app.delete("/delete_model/")
-async def delete_model_endpoint(model_name: str):
+async def delete_model_endpoint(model_name: Annotated[str, Query(description='Имя модели, которую нужно удалить')])-> JSONResponse:
+    """
+    Удаляет указанную модель.
+
+    Args:
+        model_name (str): Имя модели, которую нужно удалить.
+
+    Returns:
+        JSONResponse: Ответ с сообщением о результате операции.
+    """
     try:
         # Загрузка конфигурации
         with open("configs/config.yml", "r") as file:
@@ -138,5 +191,5 @@ async def delete_model_endpoint(model_name: str):
         return JSONResponse(content={"message": "Модель успешно удалена."}, status_code=200)
     
     except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        return JSONResponse(content={"error": str(e)}, status_code=400)
     
