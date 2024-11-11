@@ -1,4 +1,5 @@
-from fastapi import FastAPI, UploadFile, File, Query
+from fastapi import FastAPI, UploadFile, File, Query, Depends, HTTPException, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import JSONResponse
 import pandas as pd
 from data_models import ModelType
@@ -25,12 +26,31 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Настройка базовой аутентификации
+security = HTTPBasic()
+
+# Функция для проверки аутентификации
+def authenticate(credentials: HTTPBasicCredentials = Depends(security)):
+    logger.info("Попытка входа")
+    with open("configs/config.yml", "r") as file:
+        config = yaml.safe_load(file)
+    correct_username = config["username"]  
+    correct_password = config["password"]  
+    if credentials.username != correct_username or credentials.password != correct_password:
+        logger.info("Неверные креды")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Неверные учетные данные",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    
 @app.post("/train/")
 async def train_model_endpoint(
     model_type: Annotated[str, Query(description='Тип модели, которую нужно создать')] = 'SVC',
     model_name: Annotated[str, Query(description='Имя модели, которую нужно создать')] = 'my_model', 
     params: UploadFile = File(...),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    credentials: HTTPBasicCredentials = Depends(authenticate)
 )-> JSONResponse:
     """
     Обучает модель на основе предоставленных данных и параметров.
@@ -75,7 +95,7 @@ async def train_model_endpoint(
         return JSONResponse(content={"error": str(e)}, status_code=400)
     
 @app.get("/model-types/")
-async def get_model_types()-> dict:
+async def get_model_types(credentials: HTTPBasicCredentials = Depends(authenticate))-> dict:
     """
     Получает список типов моделей.
 
@@ -86,7 +106,7 @@ async def get_model_types()-> dict:
     return {"model_types": [{model_type: model_type.value} for model_type in ModelType]}
 
 @app.get("/healthcheck")
-async def healthcheck()-> dict:
+async def healthcheck(credentials: HTTPBasicCredentials = Depends(authenticate))-> dict:
     """
     Проверяет состояние сервиса.
 
@@ -99,7 +119,8 @@ async def healthcheck()-> dict:
 @app.post("/retrain/")
 async def retrain_model_endpoint(
     model_name: Annotated[str, Query(description='Имя модели, которую нужно переобучить')],
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    credentials: HTTPBasicCredentials = Depends(authenticate)
 )-> JSONResponse:
     """
     Переобучает модель на основе загруженных данных.
@@ -146,7 +167,8 @@ async def retrain_model_endpoint(
 @app.post("/predict/")
 async def predict_model_endpoint(
     model_name: Annotated[str, Query(description='Имя модели, через которую нужно дать прогноз')],
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    credentials: HTTPBasicCredentials = Depends(authenticate)
 )-> JSONResponse:
     """
     Выполняет предсказание с использованием указанной модели.
@@ -187,7 +209,8 @@ async def predict_model_endpoint(
         return JSONResponse(content={"error": str(e)}, status_code=400)
     
 @app.delete("/delete_model/")
-async def delete_model_endpoint(model_name: Annotated[str, Query(description='Имя модели, которую нужно удалить')])-> JSONResponse:
+async def delete_model_endpoint(model_name: Annotated[str, Query(description='Имя модели, которую нужно удалить')],
+                                credentials: HTTPBasicCredentials = Depends(authenticate))-> JSONResponse:
     """
     Удаляет указанную модель.
 
