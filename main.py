@@ -9,8 +9,21 @@ import yaml
 import json
 from io import StringIO
 from typing import  Annotated
+import logging
 
 app = FastAPI()
+
+# Настройка логгирования
+log_file_path = "app.log"  # Укажите путь к файлу для сохранения логов
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_file_path),  # Сохранение логов в файл
+        logging.StreamHandler()  # Вывод логов в консоль
+    ]
+)
+logger = logging.getLogger(__name__)
 
 @app.post("/train/")
 async def train_model_endpoint(
@@ -38,7 +51,9 @@ async def train_model_endpoint(
         - Содержимое: {"error": "Описание ошибки"}
     """
     # Читаем содержимое файла params
+    logger.info("Запрос на обучение модели: тип=%s, имя=%s", model_type, model_name)
     if not model_type in [model_type.value for model_type in ModelType]:
+        logger.error("Не поддерживаемый тип модели: %s", model_type)
         return JSONResponse(content={"error":"Такой тип модели не поддерживается, см. /model-types/"}, status_code=400)
     params_content = await params.read()
     params_dict = json.loads(params_content)  # Преобразуем содержимое в словарь
@@ -51,10 +66,12 @@ async def train_model_endpoint(
             config = yaml.safe_load(file)
         model_path = os.path.join(config['models_dir'], f'{model_name}.joblib')
         joblib.dump(trained_model, model_path)
+        logger.info("Модель успешно обучена и сохранена: %s", model_path)
         return JSONResponse(content={
             "message": "Модель успешно обучена и сохранена."
         })
     except Exception as e:
+        logger.exception("Ошибка при обучении модели: %s", str(e))
         return JSONResponse(content={"error": str(e)}, status_code=400)
     
 @app.get("/model-types/")
@@ -65,6 +82,7 @@ async def get_model_types()-> dict:
     Returns:
         dict: Словарь с доступными типами моделей.
     """
+    logger.exception("Запрошены типы моделей")
     return {"model_types": [{model_type: model_type.value} for model_type in ModelType]}
 
 @app.get("/healthcheck")
@@ -75,6 +93,7 @@ async def healthcheck()-> dict:
     Returns:
         dict: Словарь с информацией о состоянии сервиса.
     """
+    logger.exception("Запрошен healthcheck")
     return {"status": "healthy"}
 
 @app.post("/retrain/")
@@ -105,6 +124,7 @@ async def retrain_model_endpoint(
         
         # Проверка, существует ли модель
         if not os.path.exists(model_path):
+            logger.exception("Модель не найдена")
             return JSONResponse(content={"error": "Модель не найдена."}, status_code=404)
         
         # Загрузка существующей модели
@@ -115,11 +135,12 @@ async def retrain_model_endpoint(
         
         # Сохранение обновленной модели
         joblib.dump(updated_model, model_path)
-        
+        logger.info("Модель успешно переобучена и сохранена: %s", model_path)
         return JSONResponse(content={
             "message": "Модель успешно переобучена и сохранена."
         })
     except Exception as e:
+        logger.exception("Ошибка при переобучении модели: %s", str(e))
         return JSONResponse(content={"error": str(e)}, status_code=400)
     
 @app.post("/predict/")
@@ -157,11 +178,12 @@ async def predict_model_endpoint(
         
         # Выполнение предсказания
         predictions = trained_model.predict(inference_data)  # Предполагается, что new_data имеет правильный формат
-        
+        logger.info("Прогноз успешно получен")
         return JSONResponse(content={
             "predictions": predictions.tolist()  # Преобразуем массив предсказаний в список
         })
     except Exception as e:
+        logger.info("Ошибка при инференсе: %s", str(e))
         return JSONResponse(content={"error": str(e)}, status_code=400)
     
 @app.delete("/delete_model/")
@@ -188,8 +210,10 @@ async def delete_model_endpoint(model_name: Annotated[str, Query(description='И
         
         # Удаление модели
         os.remove(model_path)
+        logger.info("Модель успешно удалена")
         return JSONResponse(content={"message": "Модель успешно удалена."}, status_code=200)
     
     except Exception as e:
+        logger.info("Ошибка при удалении: %s", str(e))
         return JSONResponse(content={"error": str(e)}, status_code=400)
     
