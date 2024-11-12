@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "mlops-hw-1"
+version = "0.1.0"
+description = "Первое ДЗ по MLOps"
+authors = ["data1ayazist, pollucky, alexsivkovu"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "==3.11.4"
+fastapi = "0.115.4"
+python-multipart = "0.0.12"
+gradio = "5.5.0"
+joblib = "1.4.2"
+scikit-learn = "1.5.2"
+uvicorn = "0.32.0"
+grpcio = "^1.67.1"
+grpcio-tools = "^1.67.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

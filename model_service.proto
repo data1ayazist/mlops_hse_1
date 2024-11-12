@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package model_service;
+
+// Импортируем необходимые типы
+import "google/protobuf/empty.proto";
+
+message TrainModelRequest {
+    string model_type = 1;
+    string model_name = 2;
+    string params_json = 3; // JSON в виде строки
+    bytes file_content = 4; // Содержимое CSV файла в виде байтов
+}
+
+message TrainModelResponse {
+    string message = 1;
+}
+
+message RetrainModelRequest {
+    string model_name = 1;
+    bytes file_content = 2; // Содержимое CSV файла в виде байтов
+}
+
+message RetrainModelResponse {
+    string message = 1;
+}
+
+message PredictRequest {
+    string model_name = 1;
+    bytes file_content = 2; // Содержимое CSV файла в виде байтов
+}
+
+message PredictResponse {
+    repeated float predictions = 1; // Предсказания
+}
+
+message DeleteModelRequest {
+    string model_name = 1;
+}
+
+message DeleteModelResponse {
+    string message = 1;
+}
+
+message ModelTypesResponse {
+    repeated ModelType model_types = 1;
+}
+
+message ModelType {
+    string name = 1;
+}
+
+service ModelService {
+    rpc TrainModel(TrainModelRequest) returns (TrainModelResponse);
+    rpc RetrainModel(RetrainModelRequest) returns (RetrainModelResponse);
+    rpc Predict(PredictRequest) returns (PredictResponse);
+    rpc DeleteModel(DeleteModelRequest) returns (DeleteModelResponse);
+    rpc GetModelTypes(google.protobuf.Empty) returns (ModelTypesResponse);
+    rpc HealthCheck(google.protobuf.Empty) returns (google.protobuf.Empty);
+}
