@@ -3,14 +3,12 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import JSONResponse
 import pandas as pd
 from data_models import ModelType
-from train_model import train_model, retrain_model
-import joblib
-import os
 import yaml
 import json
 from io import StringIO
-from typing import  Annotated
+from typing import Annotated
 import logging
+from endpoints import app_train_model, app_retrain_model, app_predict, app_delete_model
 
 app = FastAPI()
 
@@ -18,40 +16,49 @@ app = FastAPI()
 log_file_path = "app.log"  # Укажите путь к файлу для сохранения логов
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.FileHandler(log_file_path),  # Сохранение логов в файл
-        logging.StreamHandler()  # Вывод логов в консоль
-    ]
+        logging.StreamHandler(),  # Вывод логов в консоль
+    ],
 )
 logger = logging.getLogger(__name__)
 
 # Настройка базовой аутентификации
 security = HTTPBasic()
 
+
 # Функция для проверки аутентификации
 def authenticate(credentials: HTTPBasicCredentials = Depends(security)):
     logger.info("Попытка входа")
     with open("configs/config.yml", "r") as file:
         config = yaml.safe_load(file)
-    correct_username = config["username"]  
-    correct_password = config["password"]  
-    if credentials.username != correct_username or credentials.password != correct_password:
+    correct_username = config["username"]
+    correct_password = config["password"]
+    if (
+        credentials.username != correct_username
+        or credentials.password != correct_password
+    ):
         logger.info("Неверные креды")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Неверные учетные данные",
             headers={"WWW-Authenticate": "Basic"},
         )
-    
+
+
 @app.post("/train/")
 async def train_model_endpoint(
-    model_type: Annotated[str, Query(description='Тип модели, которую нужно создать')] = 'SVC',
-    model_name: Annotated[str, Query(description='Имя модели, которую нужно создать')] = 'my_model', 
+    model_type: Annotated[
+        str, Query(description="Тип модели, которую нужно создать")
+    ] = "SVC",
+    model_name: Annotated[
+        str, Query(description="Имя модели, которую нужно создать")
+    ] = "my_model",
     params: UploadFile = File(...),
     file: UploadFile = File(...),
-    credentials: HTTPBasicCredentials = Depends(authenticate)
-)-> JSONResponse:
+    credentials: HTTPBasicCredentials = Depends(authenticate),
+) -> JSONResponse:
     """
     Обучает модель на основе предоставленных данных и параметров.
 
@@ -62,11 +69,11 @@ async def train_model_endpoint(
 
     Обучает модель и сохраняет её в соотвествующей директории, возвращает JSON-ответ с сообщением об успешном обучении модели или ошибкой.
 
-    - **Успешный ответ**: 
+    - **Успешный ответ**:
         - Код: 200
         - Содержимое: {"message": "Модель успешно обучена и сохранена."}
-    
-    - **Ошибка**: 
+
+    - **Ошибка**:
         - Код: 400
         - Содержимое: {"error": "Описание ошибки"}
     """
@@ -74,28 +81,35 @@ async def train_model_endpoint(
     logger.info("Запрос на обучение модели: тип=%s, имя=%s", model_type, model_name)
     if not model_type in [model_type.value for model_type in ModelType]:
         logger.error("Не поддерживаемый тип модели: %s", model_type)
-        return JSONResponse(content={"error":"Такой тип модели не поддерживается, см. /model-types/"}, status_code=400)
+        return JSONResponse(
+            content={"error": "Такой тип модели не поддерживается, см. /model-types/"},
+            status_code=400,
+        )
     params_content = await params.read()
-    params_dict = json.loads(params_content)  # Преобразуем содержимое в словарь
+    # Преобразуем содержимое в словарь
+    params_dict = json.loads(params_content)
     # Чтение данных из загруженного CSV файла
     contents = await file.read()
-    data = pd.read_csv(StringIO(contents.decode('utf-8')))
+    data = pd.read_csv(StringIO(contents.decode("utf-8")))
     try:
-        trained_model = train_model(model_type, data, params_dict)
-        with open("configs/config.yml", "r") as file:
-            config = yaml.safe_load(file)
-        model_path = os.path.join(config['models_dir'], f'{model_name}.joblib')
-        joblib.dump(trained_model, model_path)
-        logger.info("Модель успешно обучена и сохранена: %s", model_path)
-        return JSONResponse(content={
-            "message": "Модель успешно обучена и сохранена."
-        })
+        app_train_model(
+            data=data,
+            model_type=model_type,
+            params_dict=params_dict,
+            model_name=model_name,
+            config_path="configs/config.yml",
+        )
+        logger.info("Модель успешно обучена и сохранена.")
+        return JSONResponse(content={"message": "Модель успешно обучена и сохранена."})
     except Exception as e:
         logger.exception("Ошибка при обучении модели: %s", str(e))
         return JSONResponse(content={"error": str(e)}, status_code=400)
-    
+
+
 @app.get("/model-types/")
-async def get_model_types(credentials: HTTPBasicCredentials = Depends(authenticate))-> dict:
+async def get_model_types(
+    credentials: HTTPBasicCredentials = Depends(authenticate),
+) -> dict:
     """
     Получает список типов моделей.
 
@@ -105,8 +119,11 @@ async def get_model_types(credentials: HTTPBasicCredentials = Depends(authentica
     logger.exception("Запрошены типы моделей")
     return {"model_types": [{model_type: model_type.value} for model_type in ModelType]}
 
+
 @app.get("/healthcheck")
-async def healthcheck(credentials: HTTPBasicCredentials = Depends(authenticate))-> dict:
+async def healthcheck(
+    credentials: HTTPBasicCredentials = Depends(authenticate),
+) -> dict:
     """
     Проверяет состояние сервиса.
 
@@ -116,12 +133,15 @@ async def healthcheck(credentials: HTTPBasicCredentials = Depends(authenticate))
     logger.exception("Запрошен healthcheck")
     return {"status": "healthy"}
 
+
 @app.post("/retrain/")
 async def retrain_model_endpoint(
-    model_name: Annotated[str, Query(description='Имя модели, которую нужно переобучить')],
+    model_name: Annotated[
+        str, Query(description="Имя модели, которую нужно переобучить")
+    ],
     file: UploadFile = File(...),
-    credentials: HTTPBasicCredentials = Depends(authenticate)
-)-> JSONResponse:
+    credentials: HTTPBasicCredentials = Depends(authenticate),
+) -> JSONResponse:
     """
     Переобучает модель на основе загруженных данных.
 
@@ -135,41 +155,35 @@ async def retrain_model_endpoint(
     try:
         # Чтение данных из загруженного CSV файла
         contents = await file.read()
-        new_data = pd.read_csv(StringIO(contents.decode('utf-8')))
-        
-        # Загрузка конфигурации
-        with open("configs/config.yml", "r") as file:
-            config = yaml.safe_load(file)
-        
-        model_path = os.path.join(config['models_dir'], f'{model_name}.joblib')
-        
-        # Проверка, существует ли модель
-        if not os.path.exists(model_path):
+        new_data = pd.read_csv(StringIO(contents.decode("utf-8")))
+
+        status_retrain = app_retrain_model(
+            new_data, model_name, config_path="configs/config.yml"
+        )
+
+        if not status_retrain:
             logger.exception("Модель не найдена")
-            return JSONResponse(content={"error": "Модель не найдена."}, status_code=404)
-        
-        # Загрузка существующей модели
-        trained_model = joblib.load(model_path)
-        
-        # Переобучение модели на новых данных
-        updated_model = retrain_model(trained_model, new_data)  # Предполагается, что у вас есть функция retrain_model
-        
-        # Сохранение обновленной модели
-        joblib.dump(updated_model, model_path)
-        logger.info("Модель успешно переобучена и сохранена: %s", model_path)
-        return JSONResponse(content={
-            "message": "Модель успешно переобучена и сохранена."
-        })
+            return JSONResponse(
+                content={"error": "Модель не найдена."}, status_code=404
+            )
+        else:
+            logger.info("Модель успешно переобучена и сохранена.")
+            return JSONResponse(
+                content={"message": "Модель успешно переобучена и сохранена."}
+            )
     except Exception as e:
         logger.exception("Ошибка при переобучении модели: %s", str(e))
         return JSONResponse(content={"error": str(e)}, status_code=400)
-    
+
+
 @app.post("/predict/")
 async def predict_model_endpoint(
-    model_name: Annotated[str, Query(description='Имя модели, через которую нужно дать прогноз')],
+    model_name: Annotated[
+        str, Query(description="Имя модели, через которую нужно дать прогноз")
+    ],
     file: UploadFile = File(...),
-    credentials: HTTPBasicCredentials = Depends(authenticate)
-)-> JSONResponse:
+    credentials: HTTPBasicCredentials = Depends(authenticate),
+) -> JSONResponse:
     """
     Выполняет предсказание с использованием указанной модели.
 
@@ -183,34 +197,33 @@ async def predict_model_endpoint(
     try:
         # Чтение данных из загруженного CSV файла
         contents = await file.read()
-        inference_data = pd.read_csv(StringIO(contents.decode('utf-8')))
-        
-        # Загрузка конфигурации
-        with open("configs/config.yml", "r") as file:
-            config = yaml.safe_load(file)
-        
-        model_path = os.path.join(config['models_dir'], f'{model_name}.joblib')
-        
+        inference_data = pd.read_csv(StringIO(contents.decode("utf-8")))
+        status_predict, predictions = app_predict(
+            inference_data, model_name, config_path="configs/config.yml"
+        )
+
         # Проверка, существует ли модель
-        if not os.path.exists(model_path):
-            return JSONResponse(content={"error": "Модель не найдена."}, status_code=404)
-        
-        # Загрузка существующей модели
-        trained_model = joblib.load(model_path)
-        
-        # Выполнение предсказания
-        predictions = trained_model.predict(inference_data)  # Предполагается, что new_data имеет правильный формат
-        logger.info("Прогноз успешно получен")
-        return JSONResponse(content={
-            "predictions": predictions.tolist()  # Преобразуем массив предсказаний в список
-        })
+        if not status_predict:
+            return JSONResponse(
+                content={"error": "Модель не найдена."}, status_code=404
+            )
+        else:
+            logger.info("Прогноз успешно получен")
+            return JSONResponse(
+                content={
+                    "predictions": predictions.tolist()  # Преобразуем массив предсказаний в список
+                }
+            )
     except Exception as e:
         logger.info("Ошибка при инференсе: %s", str(e))
         return JSONResponse(content={"error": str(e)}, status_code=400)
-    
+
+
 @app.delete("/delete_model/")
-async def delete_model_endpoint(model_name: Annotated[str, Query(description='Имя модели, которую нужно удалить')],
-                                credentials: HTTPBasicCredentials = Depends(authenticate))-> JSONResponse:
+async def delete_model_endpoint(
+    model_name: Annotated[str, Query(description="Имя модели, которую нужно удалить")],
+    credentials: HTTPBasicCredentials = Depends(authenticate),
+) -> JSONResponse:
     """
     Удаляет указанную модель.
 
@@ -221,22 +234,17 @@ async def delete_model_endpoint(model_name: Annotated[str, Query(description='И
         JSONResponse: Ответ с сообщением о результате операции.
     """
     try:
-        # Загрузка конфигурации
-        with open("configs/config.yml", "r") as file:
-            config = yaml.safe_load(file)
-        
-        model_path = os.path.join(config['models_dir'], f'{model_name}.joblib')
-        
-        # Проверка, существует ли модель
-        if not os.path.exists(model_path):
-            return JSONResponse(content={"error": "Модель не найдена."}, status_code=404)
-        
-        # Удаление модели
-        os.remove(model_path)
-        logger.info("Модель успешно удалена")
-        return JSONResponse(content={"message": "Модель успешно удалена."}, status_code=200)
-    
+        delete_status = app_delete_model(model_name, config_path="configs/config.yml")
+        if not delete_status:
+            return JSONResponse(
+                content={"error": "Модель не найдена."}, status_code=404
+            )
+        else:
+            logger.info("Модель успешно удалена")
+            return JSONResponse(
+                content={"message": "Модель успешно удалена."}, status_code=200
+            )
+
     except Exception as e:
         logger.info("Ошибка при удалении: %s", str(e))
         return JSONResponse(content={"error": str(e)}, status_code=400)
-    
