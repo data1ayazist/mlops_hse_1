@@ -8,7 +8,7 @@ import json
 from io import StringIO
 from typing import Annotated
 import logging
-from endpoints import app_train_model, app_retrain_model, app_predict, app_delete_model
+from endpoints import app_train_model, app_retrain_model, app_predict, app_delete_model, get_memory_info
 
 app = FastAPI()
 
@@ -131,7 +131,9 @@ async def healthcheck(
         dict: Словарь с информацией о состоянии сервиса.
     """
     logger.exception("Запрошен healthcheck")
-    return {"status": "healthy"}
+    used, free = get_memory_info()
+    return {"status": "healthy", "Занятая память ОЗУ": f"{used} байт", 
+            "Свободная память ОЗУ": f"{free} байт"}
 
 
 @app.post("/retrain/")

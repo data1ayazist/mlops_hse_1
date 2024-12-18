@@ -17,7 +17,7 @@
 
 1. Запуск FastAPI-сервиса:
    ```bash
-   uvicorn main:app --host 0.0.0.0 --port 8000
+   uvicorn app:app --host 0.0.0.0 --port 8000
 2. Запуск Gradio-приложения:
    ```bash
    python gradio_app.py

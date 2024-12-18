@@ -5,6 +5,7 @@ import os
 import yaml
 from typing import Tuple, Dict, Any
 import numpy as np
+import resource
 
 
 def app_train_model(
@@ -115,3 +116,15 @@ def app_delete_model(model_name: str, config_path: str) -> bool:
     # Удаление модели
     os.remove(model_path)
     return True
+
+def get_memory_info() -> Tuple[int, int]:
+    """
+    Возвращает количество занятой и свободной оперативной памяти в байтах.
+
+    :return: Кортеж, где первый элемент - количество занятой памяти,
+             а второй элемент - количество свободной памяти.
+    """
+    usage = resource.getrusage(resource.RUSAGE_SELF)
+    used_memory = usage.ru_maxrss * 1024  # ru_maxrss возвращает значение в килобайтах
+    free_memory = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES')  # Свободная память
+    return used_memory, free_memory

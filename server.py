@@ -1,17 +1,13 @@
 import grpc
 from concurrent import futures
 from data_models import ModelType
-from train_model import train_model, retrain_model
 import model_service_pb2
 import model_service_pb2_grpc
 import pandas as pd
-import joblib
-import os
-import yaml
 import json
 import logging
 from io import StringIO
-from endpoints import app_train_model, app_retrain_model, app_predict, app_delete_model
+from endpoints import app_train_model, app_retrain_model, app_predict, app_delete_model, get_memory_info
 
 # Настройка логгирования
 log_file_path = "app_grpc.log"
@@ -127,7 +123,11 @@ class ModelService(model_service_pb2_grpc.ModelServiceServicer):
 
     def HealthCheck(self):
         logger.info("Запрошен healthcheck")
-        return model_service_pb2.Empty()
+        used_memory, free_memory = get_memory_info()
+        return model_service_pb2.MemoryInfo(
+            used_memory=used_memory,
+            free_memory=free_memory
+        )
 
 
 def serve():
