@@ -24,3 +24,271 @@ NoneType: None
 2024-11-11 20:32:27,489 - main - INFO - Попытка входа
 2024-11-11 20:34:17,416 - main - INFO - Попытка входа
 2024-11-11 20:34:17,437 - main - INFO - Прогноз успешно получен
+2024-12-21 22:33:01,822 - app - INFO - Попытка входа
+2024-12-21 22:33:01,839 - app - INFO - Запрос на обучение модели: тип=SVC, имя=my_model_s3
+2024-12-21 22:33:01,902 - app - ERROR - Ошибка при обучении модели: expected str, bytes or os.PathLike object, not dict
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 95, in train_model_endpoint
+    app_train_model(
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 31, in app_train_model
+    s3_client = get_s3_client(config)
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\s3_client.py", line 6, in get_s3_client
+    with open(config_path) as config_file:
+         ^^^^^^^^^^^^^^^^^
+TypeError: expected str, bytes or os.PathLike object, not dict
+2024-12-21 22:34:25,035 - app - INFO - Попытка входа
+2024-12-21 22:34:25,039 - app - INFO - Запрос на обучение модели: тип=SVC, имя=my_model_s3
+2024-12-21 22:34:25,967 - app - ERROR - Ошибка при обучении модели: module 'joblib' has no attribute 'dumps'
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 95, in train_model_endpoint
+    app_train_model(
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 34, in app_train_model
+    model_bytes = joblib.dumps(trained_model)
+                  ^^^^^^^^^^^^
+AttributeError: module 'joblib' has no attribute 'dumps'
+2024-12-21 22:35:14,298 - app - INFO - Попытка входа
+2024-12-21 22:35:14,298 - app - INFO - Запрос на обучение модели: тип=SVC, имя=my_model
+2024-12-21 22:35:14,711 - app - ERROR - Ошибка при обучении модели: dump() missing 1 required positional argument: 'filename'
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 95, in train_model_endpoint
+    app_train_model(
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 34, in app_train_model
+    model_bytes = joblib.dump(trained_model)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: dump() missing 1 required positional argument: 'filename'
+2024-12-21 22:37:32,517 - app - INFO - Попытка входа
+2024-12-21 22:37:32,527 - app - INFO - Запрос на обучение модели: тип=SVC, имя=my_model_s3
+2024-12-21 22:37:33,181 - app - INFO - Модель успешно обучена и сохранена.
+2024-12-21 23:22:47,306 - app - INFO - Попытка входа
+2024-12-21 23:22:47,322 - app - ERROR - Запрошены типы моделей
+NoneType: None
+2024-12-21 23:23:07,746 - app - INFO - Попытка входа
+2024-12-21 23:23:09,067 - app - ERROR - Ошибка при переобучении модели: 
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 162, in retrain_model_endpoint
+    status_retrain = app_retrain_model(
+                     ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 67, in app_retrain_model
+    trained_model = joblib.load(model_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 648, in load
+    obj = _unpickle(fobj)
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 577, in _unpickle
+    obj = unpickler.load()
+          ^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\anaconda3\Lib\pickle.py", line 1211, in load
+    raise EOFError
+EOFError
+2024-12-21 23:32:20,844 - app - INFO - Попытка входа
+2024-12-21 23:32:27,322 - app - INFO - Попытка входа
+2024-12-21 23:32:27,660 - app - INFO - Модель успешно удалена
+2024-12-21 23:32:33,460 - app - INFO - Попытка входа
+2024-12-21 23:32:33,820 - app - ERROR - Модель не найдена
+NoneType: None
+2024-12-21 23:32:56,857 - app - INFO - Попытка входа
+2024-12-21 23:32:56,868 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3
+2024-12-21 23:32:57,367 - app - INFO - Модель успешно обучена и сохранена.
+2024-12-21 23:33:06,998 - app - INFO - Попытка входа
+2024-12-21 23:33:07,411 - app - ERROR - Ошибка при переобучении модели: 
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 162, in retrain_model_endpoint
+    status_retrain = app_retrain_model(
+                     ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 67, in app_retrain_model
+    trained_model = joblib.load(model_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 648, in load
+    obj = _unpickle(fobj)
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 577, in _unpickle
+    obj = unpickler.load()
+          ^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\anaconda3\Lib\pickle.py", line 1211, in load
+    raise EOFError
+EOFError
+2024-12-21 23:37:04,582 - app - INFO - Попытка входа
+2024-12-21 23:37:05,183 - app - ERROR - Модель не найдена
+NoneType: None
+2024-12-21 23:37:08,956 - app - INFO - Попытка входа
+2024-12-21 23:37:09,397 - app - ERROR - Ошибка при переобучении модели: 
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 162, in retrain_model_endpoint
+    status_retrain = app_retrain_model(
+                     ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 67, in app_retrain_model
+    file = joblib.load(f)
+          ^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 648, in load
+    obj = _unpickle(fobj)
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 577, in _unpickle
+    obj = unpickler.load()
+          ^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\anaconda3\Lib\pickle.py", line 1211, in load
+    raise EOFError
+EOFError
+2024-12-21 23:44:26,305 - app - INFO - Попытка входа
+2024-12-21 23:44:26,718 - app - INFO - Ошибка при инференсе: [Errno 2] No such file or directory: 'models/s3.joblib'
+2024-12-21 23:44:42,126 - app - INFO - Попытка входа
+2024-12-21 23:44:42,455 - app - ERROR - Ошибка при переобучении модели: 
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 162, in retrain_model_endpoint
+    status_retrain = app_retrain_model(
+                     ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 67, in app_retrain_model
+    file = joblib.load(f)
+          ^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 648, in load
+    obj = _unpickle(fobj)
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 577, in _unpickle
+    obj = unpickler.load()
+          ^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\anaconda3\Lib\pickle.py", line 1211, in load
+    raise EOFError
+EOFError
+2024-12-21 23:45:00,494 - app - INFO - Попытка входа
+2024-12-21 23:45:00,508 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3
+2024-12-21 23:45:01,391 - app - INFO - Модель успешно обучена и сохранена.
+2024-12-21 23:45:06,259 - app - INFO - Попытка входа
+2024-12-21 23:45:06,603 - app - ERROR - Ошибка при переобучении модели: 
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 162, in retrain_model_endpoint
+    status_retrain = app_retrain_model(
+                     ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 67, in app_retrain_model
+    file = joblib.load(f)
+          ^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 648, in load
+    obj = _unpickle(fobj)
+          ^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 577, in _unpickle
+    obj = unpickler.load()
+          ^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\anaconda3\Lib\pickle.py", line 1211, in load
+    raise EOFError
+EOFError
+2024-12-22 00:33:26,094 - app - INFO - Попытка входа
+2024-12-22 00:33:45,911 - app - ERROR - Модель не найдена
+NoneType: None
+2024-12-22 00:34:28,275 - app - INFO - Попытка входа
+2024-12-22 00:35:42,404 - app - INFO - Попытка входа
+2024-12-22 00:35:42,413 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3
+2024-12-22 00:36:00,200 - app - ERROR - Ошибка при обучении модели: An error occurred (502) when calling the PutObject operation (reached max retries: 4): Bad Gateway
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 95, in train_model_endpoint
+    app_train_model(
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 41, in app_train_model
+    s3_client.put_object(Bucket=bucket_name, Key=model_path, Body=model_bytes)
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\botocore\client.py", line 569, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\botocore\client.py", line 1023, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.exceptions.ClientError: An error occurred (502) when calling the PutObject operation (reached max retries: 4): Bad Gateway
+2024-12-22 00:36:34,167 - app - INFO - Попытка входа
+2024-12-22 00:36:34,171 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3_new
+2024-12-22 00:36:50,973 - app - ERROR - Ошибка при обучении модели: An error occurred (502) when calling the PutObject operation (reached max retries: 4): Bad Gateway
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 95, in train_model_endpoint
+    app_train_model(
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 41, in app_train_model
+    s3_client.put_object(Bucket=bucket_name, Key=model_path, Body=model_bytes)
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\botocore\client.py", line 569, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\botocore\client.py", line 1023, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.exceptions.ClientError: An error occurred (502) when calling the PutObject operation (reached max retries: 4): Bad Gateway
+2024-12-22 00:37:45,820 - app - INFO - Попытка входа
+2024-12-22 00:37:45,823 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3
+2024-12-22 00:38:00,752 - app - ERROR - Ошибка при обучении модели: An error occurred (502) when calling the PutObject operation (reached max retries: 4): Bad Gateway
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 95, in train_model_endpoint
+    app_train_model(
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 41, in app_train_model
+    s3_client.put_object(Bucket=bucket_name, Key=model_path, Body=model_bytes)
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\botocore\client.py", line 569, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\botocore\client.py", line 1023, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.exceptions.ClientError: An error occurred (502) when calling the PutObject operation (reached max retries: 4): Bad Gateway
+2024-12-22 00:42:13,012 - app - INFO - Попытка входа
+2024-12-22 00:42:13,074 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3
+2024-12-22 00:42:15,664 - app - INFO - Модель успешно обучена и сохранена.
+2024-12-22 00:42:33,337 - app - INFO - Попытка входа
+2024-12-22 00:42:33,842 - app - ERROR - Ошибка при переобучении модели: 
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 162, in retrain_model_endpoint
+    status_retrain = app_retrain_model(
+                     ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 71, in app_retrain_model
+    trained_model = joblib.load(temp_model_path)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 658, in load
+    obj = _unpickle(fobj, filename, mmap_mode)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\joblib\numpy_pickle.py", line 577, in _unpickle
+    obj = unpickler.load()
+          ^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\anaconda3\Lib\pickle.py", line 1211, in load
+    raise EOFError
+EOFError
+2024-12-22 00:52:03,546 - app - INFO - Попытка входа
+2024-12-22 00:52:04,080 - app - INFO - Модель успешно удалена
+2024-12-22 00:52:20,025 - app - INFO - Попытка входа
+2024-12-22 00:52:20,032 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3
+2024-12-22 00:52:20,499 - app - ERROR - Ошибка при обучении модели: 'S3' object has no attribute 'Object'
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 95, in train_model_endpoint
+    app_train_model(
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 45, in app_train_model
+    s3_client.Object(bucket_name, model_path).put(Body=model_bytes)
+    ^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\botocore\client.py", line 922, in __getattr__
+    raise AttributeError(
+AttributeError: 'S3' object has no attribute 'Object'
+2024-12-22 00:55:16,912 - app - INFO - Попытка входа
+2024-12-22 00:55:16,919 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3
+2024-12-22 00:55:17,381 - app - ERROR - Ошибка при обучении модели: 'S3' object has no attribute 'Object'
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 95, in train_model_endpoint
+    app_train_model(
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 45, in app_train_model
+    object = s3_client.Object(bucket_name, model_path)
+             ^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\botocore\client.py", line 922, in __getattr__
+    raise AttributeError(
+AttributeError: 'S3' object has no attribute 'Object'
+2024-12-22 00:56:12,283 - app - INFO - Попытка входа
+2024-12-22 00:56:12,293 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3
+2024-12-22 00:56:12,687 - app - ERROR - Ошибка при обучении модели: 'S3' object has no attribute 'Object'
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 95, in train_model_endpoint
+    app_train_model(
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 45, in app_train_model
+    object = s3_client.Object(bucket_name, model_path)
+             ^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\AppData\Local\pypoetry\Cache\virtualenvs\mlops-hw-1-MdYKgCNj-py3.11\Lib\site-packages\botocore\client.py", line 922, in __getattr__
+    raise AttributeError(
+AttributeError: 'S3' object has no attribute 'Object'
+2024-12-22 01:00:45,240 - app - INFO - Попытка входа
+2024-12-22 01:00:45,245 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3
+2024-12-22 01:00:46,033 - app - INFO - Модель успешно обучена и сохранена.
+2024-12-22 01:01:02,226 - app - INFO - Попытка входа
+2024-12-22 01:01:02,721 - app - INFO - Модель успешно переобучена и сохранена.
+2024-12-22 01:01:47,023 - app - INFO - Попытка входа
+2024-12-22 01:01:47,357 - app - INFO - Ошибка при инференсе: 
+2024-12-22 01:04:20,424 - app - INFO - Попытка входа
+2024-12-22 01:19:32,660 - app - INFO - Попытка входа
+2024-12-22 01:19:33,427 - app - INFO - Модель успешно удалена
+2024-12-22 01:19:52,843 - app - INFO - Попытка входа
+2024-12-22 01:19:52,848 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3
+2024-12-22 01:19:53,406 - app - INFO - Модель успешно обучена и сохранена.
+2024-12-22 01:20:07,402 - app - INFO - Попытка входа
+2024-12-22 01:20:07,784 - app - INFO - Модель успешно переобучена и сохранена.
+2024-12-22 01:20:19,065 - app - INFO - Попытка входа
+2024-12-22 01:20:19,668 - app - INFO - Прогноз успешно получен

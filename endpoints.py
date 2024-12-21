@@ -5,7 +5,12 @@ import os
 import yaml
 from typing import Tuple, Dict, Any
 import numpy as np
-import resource
+
+# import resource
+from s3_client import get_s3_client, save_model, get_model
+from io import BytesIO
+import os
+from botocore.exceptions import NoCredentialsError, ClientError
 
 
 def app_train_model(
@@ -27,8 +32,8 @@ def app_train_model(
     trained_model = train_model(model_type, data, params_dict)
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
-    model_path = os.path.join(config["models_dir"], f"{model_name}.joblib")
-    joblib.dump(trained_model, model_path)
+    s3_client = get_s3_client(config)
+    save_model(trained_model, s3_client, config, model_name)
 
 
 def app_retrain_model(
@@ -45,22 +50,19 @@ def app_retrain_model(
     # Загрузка конфигурации
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
-
-    model_path = os.path.join(config["models_dir"], f"{model_name}.joblib")
-
-    # Проверка, существует ли модель
-    if not os.path.exists(model_path):
+    s3_client = get_s3_client(config)
+    bucket_name = config["MINIO_BUCKET_NAME"]
+    models_dir = config["models_dir"]
+    model_path = f"{models_dir}/{model_name}.joblib"
+    try:
+        s3_client.head_object(Bucket=bucket_name, Key=model_path)
+    except ClientError:
         return False
-
-    # Загрузка существующей модели
-    trained_model = joblib.load(model_path)
-
+    trained_model = get_model(s3_client, config, model_name)
     # Переобучение модели на новых данных
     updated_model = retrain_model(trained_model, new_data)
-
     # Сохранение обновленной модели
-    joblib.dump(updated_model, model_path)
-
+    save_model(updated_model, s3_client, config, model_name)
     return True
 
 
@@ -80,16 +82,15 @@ def app_predict(
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
 
-    model_path = os.path.join(config["models_dir"], f"{model_name}.joblib")
-
-    # Проверка, существует ли модель
-    if not os.path.exists(model_path):
+    s3_client = get_s3_client(config)
+    bucket_name = config["MINIO_BUCKET_NAME"]
+    models_dir = config["models_dir"]
+    model_path = f"{models_dir}/{model_name}.joblib"
+    try:
+        s3_client.head_object(Bucket=bucket_name, Key=model_path)
+    except ClientError:
         return False, None
-
-    # Загрузка существующей модели
-    trained_model = joblib.load(model_path)
-
-    # Выполнение предсказания
+    trained_model = get_model(s3_client, config, model_name)
     predictions = trained_model.predict(inference_data)
 
     return True, predictions
@@ -106,16 +107,17 @@ def app_delete_model(model_name: str, config_path: str) -> bool:
     # Загрузка конфигурации
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
-
-    model_path = os.path.join(config["models_dir"], f"{model_name}.joblib")
-
-    # Проверка, существует ли модель
-    if not os.path.exists(model_path):
+    s3_client = get_s3_client(config)
+    bucket_name = config["MINIO_BUCKET_NAME"]
+    models_dir = config["models_dir"]
+    model_path = f"{models_dir}/{model_name}.joblib"
+    try:
+        s3_client.head_object(Bucket=bucket_name, Key=model_path)
+    except ClientError:
         return False
-
-    # Удаление модели
-    os.remove(model_path)
+    s3_client.delete_object(Bucket=bucket_name, Key=model_path)
     return True
+
 
 def get_memory_info() -> Tuple[int, int]:
     """
@@ -126,5 +128,7 @@ def get_memory_info() -> Tuple[int, int]:
     """
     usage = resource.getrusage(resource.RUSAGE_SELF)
     used_memory = usage.ru_maxrss * 1024  # ru_maxrss возвращает значение в килобайтах
-    free_memory = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES')  # Свободная память
+    free_memory = os.sysconf("SC_PAGE_SIZE") * os.sysconf(
+        "SC_AVPHYS_PAGES"
+    )  # Свободная память
     return used_memory, free_memory

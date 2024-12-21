@@ -196,29 +196,29 @@ async def predict_model_endpoint(
     Returns:
         JSONResponse: Ответ с предсказаниями или сообщением об ошибке.
     """
-    try:
+    # try:
         # Чтение данных из загруженного CSV файла
-        contents = await file.read()
-        inference_data = pd.read_csv(StringIO(contents.decode("utf-8")))
-        status_predict, predictions = app_predict(
-            inference_data, model_name, config_path="configs/config.yml"
-        )
+    contents = await file.read()
+    inference_data = pd.read_csv(StringIO(contents.decode("utf-8")))
+    status_predict, predictions = app_predict(
+        inference_data, model_name, config_path="configs/config.yml"
+    )
 
-        # Проверка, существует ли модель
-        if not status_predict:
-            return JSONResponse(
-                content={"error": "Модель не найдена."}, status_code=404
-            )
-        else:
-            logger.info("Прогноз успешно получен")
-            return JSONResponse(
-                content={
-                    "predictions": predictions.tolist()  # Преобразуем массив предсказаний в список
-                }
-            )
-    except Exception as e:
-        logger.info("Ошибка при инференсе: %s", str(e))
-        return JSONResponse(content={"error": str(e)}, status_code=400)
+    # Проверка, существует ли модель
+    if not status_predict:
+        return JSONResponse(
+            content={"error": "Модель не найдена."}, status_code=404
+        )
+    else:
+        logger.info("Прогноз успешно получен")
+        return JSONResponse(
+            content={
+                "predictions": predictions.tolist()  # Преобразуем массив предсказаний в список
+            }
+        )
+    # except Exception as e:
+    #     logger.info("Ошибка при инференсе: %s", str(e))
+    #     return JSONResponse(content={"error": str(e)}, status_code=400)
 
 
 @app.delete("/delete_model/")

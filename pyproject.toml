@@ -9,14 +9,19 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "==3.11.4"
 fastapi = "0.115.4"
-python-multipart = "0.0.12"
-gradio = "5.5.0"
-joblib = "1.4.2"
-scikit-learn = "1.5.2"
-uvicorn = "0.32.0"
-grpcio = "^1.67.1"
-grpcio-tools = "^1.67.1"
+boto3 = "^1.35.86"
+python-multipart = "^0.0.20"
+gradio = "^5.9.1"
+joblib = "^1.4.2"
+scikit-learn = "^1.6.0"
+uvicorn = "^0.34.0"
+grpcio = "^1.68.1"
+grpcio-tools = "^1.68.1"
+resource = "^0.2.1"
 
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
 
 [build-system]
 requires = ["poetry-core"]
