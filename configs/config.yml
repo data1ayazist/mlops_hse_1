@@ -2,7 +2,7 @@ models_dir: "models"
 username: "dungeon_master"
 password: "Van Darkholme"
 MINIO_ENDPOINT: 'localhost:9000'
-MINIO_ACCESS_KEY: ' '
+MINIO_ACCESS_KEY: 'Gipsy_Kings'
 MINIO_SECRET_KEY: 'Gipsy_Kings'
 MINIO_BUCKET_NAME: 'mlops'
 TEMP_BUFFER_PATH: 'temp_buffer'
