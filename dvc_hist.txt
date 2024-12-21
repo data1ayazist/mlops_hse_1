@@ -1,0 +1,18 @@
+git init
+dvc init
+dvc add tests\test_inference.csv
+git rm -r --cached 'tests\test_inference.csv'
+git rm -r --cached tests\test_inference.csv
+dvc add tests\test_inference.csv
+git add tests/test_inference.csv.dvc dvc.yaml .gitignore
+git add tests/test_inference.csv.dvc .gitignore
+git add tests/test_inference.csv.dvc
+git commit -m "������� csv � DVC"
+dvc remote add -d myremote s3://mlops
+dvc remote modify myremote endpointurl http://127.0.0.1:9000
+dvc remote modify --local myremote access_key_id Gipsy_Kings
+dvc remote modify --local myremote secret_access_key  Gipsy_Kings
+dvc push -r myremote
+pip install dvc_s3
+dvc push -r myremote
+
