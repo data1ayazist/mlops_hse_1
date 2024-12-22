@@ -1,7 +1,10 @@
 import pandas as pd
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-
+import mlflow
+import mlflow.sklearn
+import datetime
+from sklearn.metrics import accuracy_score
 
 def train_model(model_type, data: pd.DataFrame, params: dict = None):
     """
@@ -31,8 +34,23 @@ def train_model(model_type, data: pd.DataFrame, params: dict = None):
 
     # Настройка гиперпараметров с помощью GridSearchCV
     print(params)
+    mlflow.set_tracking_uri(uri="http://mlflow:5000")
+    mlflow.set_experiment(f"{model_type}_{datetime.datetime.now()}")
     trained_model = model(**params)
     trained_model.fit(X, y)
+    y_pred = trained_model.predict(X)
+    accuracy= accuracy_score(y, y_pred)
+        # Регистрируем метрики в MLflow
+    with mlflow.start_run():
+        mlflow.log_metric("accuracy", accuracy)
+
+        # Сохраняем модель в MLflow
+        mlflow.sklearn.log_model(trained_model, "model")
+        model_info = mlflow.sklearn.log_model(
+        sk_model=trained_model,
+        registered_model_name=f"{model_type}_{datetime.datetime.now()}",
+        artifact_path = 'app_model'
+    )
 
     return trained_model
 

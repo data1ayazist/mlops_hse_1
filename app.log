@@ -292,3 +292,22 @@ AttributeError: 'S3' object has no attribute 'Object'
 2024-12-22 01:20:07,784 - app - INFO - Модель успешно переобучена и сохранена.
 2024-12-22 01:20:19,065 - app - INFO - Попытка входа
 2024-12-22 01:20:19,668 - app - INFO - Прогноз успешно получен
+2024-12-22 03:08:17,754 - app - INFO - Попытка входа
+2024-12-22 03:08:17,795 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3_mlflow
+2024-12-22 03:08:47,573 - app - INFO - Модель успешно обучена и сохранена.
+2024-12-22 03:18:25,085 - app - INFO - Попытка входа
+2024-12-22 03:18:25,100 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3_ml_f
+2024-12-22 03:18:46,075 - app - ERROR - Ошибка при обучении модели: log_model() missing 1 required positional argument: 'artifact_path'
+Traceback (most recent call last):
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\app.py", line 95, in train_model_endpoint
+    app_train_model(
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\endpoints.py", line 32, in app_train_model
+    trained_model = train_model(model_type, data, params_dict)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\asus\Desktop\ФТИАД_MLOps\hw_2\train_model.py", line 49, in train_model
+    model_info = mlflow.sklearn.log_model(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: log_model() missing 1 required positional argument: 'artifact_path'
+2024-12-22 03:22:02,538 - app - INFO - Попытка входа
+2024-12-22 03:22:02,555 - app - INFO - Запрос на обучение модели: тип=SVC, имя=s3_m
+2024-12-22 03:22:53,354 - app - INFO - Модель успешно обучена и сохранена.

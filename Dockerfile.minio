@@ -1,0 +1,9 @@
+# Используем официальный образ MinIO
+FROM minio/minio
+
+# Устанавливаем переменные окружения для доступа
+ENV MINIO_ACCESS_KEY Gipsy_Kings
+ENV MINIO_SECRET_KEY Gipsy_Kings
+EXPOSE 9000
+# Запускаем MinIO
+ENTRYPOINT ["minio", "server", "/data"]

@@ -1,16 +1,14 @@
 import pandas as pd
 from train_model import train_model, retrain_model
-import joblib
 import os
 import yaml
 from typing import Tuple, Dict, Any
 import numpy as np
 
-# import resource
+import resource
 from s3_client import get_s3_client, save_model, get_model
-from io import BytesIO
 import os
-from botocore.exceptions import NoCredentialsError, ClientError
+from botocore.exceptions import ClientError
 
 
 def app_train_model(
