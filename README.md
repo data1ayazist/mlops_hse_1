@@ -54,9 +54,8 @@
 1. Теперь перед этим нужно подять контейнер для minio:
 
    ```bash
-   docker run -p 9000:9000 --name minio -e "MINIO_ACCESS_KEY=Gipsy_Kings" 
-  -e "MINIO_SECRET_KEY=Gipsy_Kings" \
-  minio/minio server /data
+   docker run -p 9000:9000 --name minio -e "MINIO_ACCESS_KEY=Gipsy_Kings" -e "MINIO_SECRET_KEY=Gipsy_Kings" minio/minio server /data
+  
 2. И поднять и запустить контейнер в Dockerfile.mlflow
 ## Распределение ролей в команде
 Валетдинов Аяз -  FastAPI. Полина Щукина - gradio+аутентификация. Сивков Александр - poetry+gRPC
