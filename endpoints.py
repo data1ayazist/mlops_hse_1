@@ -5,7 +5,7 @@ import yaml
 from typing import Tuple, Dict, Any
 import numpy as np
 
-import resource
+# import resource
 from s3_client import get_s3_client, save_model, get_model
 import os
 from botocore.exceptions import ClientError

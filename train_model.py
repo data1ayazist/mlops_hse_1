@@ -34,7 +34,7 @@ def train_model(model_type, data: pd.DataFrame, params: dict = None):
 
     # Настройка гиперпараметров с помощью GridSearchCV
     print(params)
-    mlflow.set_tracking_uri(uri="http://mlflow:5000")
+    mlflow.set_tracking_uri(uri="http://localhost:5000")
     mlflow.set_experiment(f"{model_type}_{datetime.datetime.now()}")
     trained_model = model(**params)
     trained_model.fit(X, y)
