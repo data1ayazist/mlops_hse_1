@@ -50,11 +50,16 @@ message ModelType {
     string name = 1;
 }
 
+message MemoryInfo {
+    int64 used_memory = 1;  // Занятая память в байтах
+    int64 free_memory = 2;  // Свободная память в байтах
+}
+
 service ModelService {
     rpc TrainModel(TrainModelRequest) returns (TrainModelResponse);
     rpc RetrainModel(RetrainModelRequest) returns (RetrainModelResponse);
     rpc Predict(PredictRequest) returns (PredictResponse);
     rpc DeleteModel(DeleteModelRequest) returns (DeleteModelResponse);
     rpc GetModelTypes(google.protobuf.Empty) returns (ModelTypesResponse);
-    rpc HealthCheck(google.protobuf.Empty) returns (google.protobuf.Empty);
+    rpc HealthCheck(google.protobuf.Empty) returns (MemoryInfo);
 }

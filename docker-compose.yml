@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  minio:
+    build:
+      context: .
+      dockerfile: Dockerfile.minio
+    ports:
+      - "9000:9000"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    ports:
+      - "5000:5000"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - minio
+      - mlflow
+
+volumes:
+  minio_data:
