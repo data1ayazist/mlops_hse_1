@@ -63,7 +63,7 @@ class ModelServiceStub(object):
         self.HealthCheck = channel.unary_unary(
                 '/model_service.ModelService/HealthCheck',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                response_deserializer=model__service__pb2.MemoryInfo.FromString,
                 _registered_method=True)
 
 
@@ -137,7 +137,7 @@ def add_ModelServiceServicer_to_server(servicer, server):
             'HealthCheck': grpc.unary_unary_rpc_method_handler(
                     servicer.HealthCheck,
                     request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                    response_serializer=model__service__pb2.MemoryInfo.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -301,7 +301,7 @@ class ModelService(object):
             target,
             '/model_service.ModelService/HealthCheck',
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            model__service__pb2.MemoryInfo.FromString,
             options,
             channel_credentials,
             insecure,

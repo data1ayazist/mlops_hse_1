@@ -1,0 +1,5 @@
+outs:
+- md5: 7431b9ecd6656bc66c7783cec1d26efd
+  size: 3964
+  hash: md5
+  path: test_inference.csv

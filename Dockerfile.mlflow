@@ -1,0 +1,13 @@
+# Используем официальный образ Python
+FROM python:3.11.4-slim
+# Устанавливаем необходимые зависимости
+RUN pip install --no-cache-dir mlflow
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Открываем порт для MLflow
+EXPOSE 5000
+
+# Запускаем MLflow
+CMD ["mlflow", "ui", "--host", "0.0.0.0"]

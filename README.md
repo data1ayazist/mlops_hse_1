@@ -17,7 +17,7 @@
 
 1. Запуск FastAPI-сервиса:
    ```bash
-   uvicorn main:app --host 0.0.0.0 --port 8000
+   uvicorn app:app --host 0.0.0.0 --port 8000
 2. Запуск Gradio-приложения:
    ```bash
    python gradio_app.py
@@ -28,5 +28,34 @@
    ```bash
    python test_grpc_server.py
 
+# Установка и запуск приложения в Docker
+
+Этот проект использует Docker для создания изолированного окружения и запуска приложения.
+
+## Требования
+
+- Установленный Docker на вашем компьютере. [Инструкции по установке Docker](https://docs.docker.com/get-docker/).
+
+## Сборка Docker-образа
+
+1. Скачайте или клонируйте репозиторий с проектом на ваш компьютер.
+2. Перейдите в директорию проекта, где находится `Dockerfile`.
+3. Выполните следующую команду для сборки Docker-образа:
+
+   ```bash
+   docker build -t myapp .
+4. Запустите контейнер
+
+   ```bash
+   docker run -p 8000:8000 myapp
+
+
+## Поправки по ДЗ-2
+1. Теперь перед этим нужно подять контейнер для minio:
+
+   ```bash
+   docker run -p 9000:9000 --name minio -e "MINIO_ACCESS_KEY=Gipsy_Kings" -e "MINIO_SECRET_KEY=Gipsy_Kings" minio/minio server /data
+  
+2. И поднять и запустить контейнер в Dockerfile.mlflow
 ## Распределение ролей в команде
-Валетдинов Аяз -  FastAPI. Полина Щукина - gradio+аутентификация. Сивков Александр - poetry+gRPC
+Валетдинов Аяз -  MINIO. Полина Щукина - MLflow. Сивков Александр - docker

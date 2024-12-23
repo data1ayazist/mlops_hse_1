@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/asus/Desktop/%D0%A4%D0%A2%D0%98%D0%90%D0%94_MLOps/hw_2/mlruns/994865045380825441/221ada7db3a44ff98735a8812b26fff8/artifacts
+end_time: 1734826125781
+entry_point_name: ''
+experiment_id: '994865045380825441'
+lifecycle_stage: active
+run_id: 221ada7db3a44ff98735a8812b26fff8
+run_name: masked-frog-279
+run_uuid: 221ada7db3a44ff98735a8812b26fff8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1734826102669
+status: 3
+tags: []
+user_id: asus
